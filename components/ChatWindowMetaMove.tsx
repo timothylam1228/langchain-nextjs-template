@@ -33,7 +33,6 @@ function ChatMessages(props: {
   className?: string;
   tool?: string;
 }) {
-  console.log("props.messages", props.messages);
   return (
     <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
       {props.messages.map((m, i) => {
@@ -263,7 +262,6 @@ export function ChatWindowMetaMove(props: {
     });
     const json = await response.json();
     setIntermediateStepsLoading(false);
-    console.log("json", json);
 
     if (!response.ok) {
       toast.error(`Error while processing your request`, {

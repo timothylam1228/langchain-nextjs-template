@@ -148,7 +148,6 @@ export async function POST(req: NextRequest) {
 
     const llmWithTools = llm.bindTools(tools);
 
-    console.log("messages", messages);
     const aiMessage = await llmWithTools.invoke(messages);
     let parsedContent;
     try {
@@ -186,7 +185,6 @@ export async function POST(req: NextRequest) {
     const agentMessage = messages[messages.length - 1];
     // return the message from the agent
 
-    console.log("agentMessage", agentMessage.content);
     return NextResponse.json({
       messages: {
         content: agentMessage.content,

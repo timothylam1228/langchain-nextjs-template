@@ -83,13 +83,17 @@ export async function get_twotag_nft(
     const collectionData: CollectionData[] =
       graphqlData.data.current_collections_v2;
 
+    if (!collectionData) {
+      return [];
+    }
+
     const formattedData: FormattedNFTData[] = tokenOwnerships.map(
       (ownership) => {
         return {
           token_id: ownership.current_token_data.token_data_id,
           token_uri: ownership.current_token_data.token_uri,
           token_name: ownership.current_token_data.token_name,
-          collection_description: collectionData[0]?.description || "", // Handle cases where collection data might be missing
+          collection_description: collectionData[0]?.description || "",
           collection_uri: collectionData[0]?.uri || "",
         };
       },
@@ -97,7 +101,6 @@ export async function get_twotag_nft(
 
     return formattedData;
   } catch (error: any) {
-    console.error("Error in get_twotag_nft:", error);
-    throw new Error(`2tag get nft failed: ${error.message}`);
+    return [];
   }
 }

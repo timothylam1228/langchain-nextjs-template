@@ -9,7 +9,7 @@ export default function AgentsPage() {
         <li>
           🎯
           <span className="ml-2">
-            MetaMove is your AI assistant for crypto-related tasks and blockchain interactions.
+            We are AI assistant for crypto-related tasks and blockchain interactions.
           </span>
         </li>
         <li className="hidden text-l md:block">
