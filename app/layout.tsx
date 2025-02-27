@@ -12,6 +12,7 @@ import { WalletConnectionHandler } from "@/components/wallet/User_store";
 import Wallet from "@/components/wallet/client_wallet";
 import Image from "next/image";
 import { ThemeToggle } from "@/components/wallet/ThemeToggle";
+import { ThemeProvider } from "@/components/wallet/ThemeProvider";
 
 const publicSans = Public_Sans({ subsets: ["latin"] });
 const geistSans = Geist({
@@ -50,7 +51,7 @@ export default function RootLayout({
     <AutoConnectProvider>
       <ReactQueryClientProvider>
         <WalletProvider>
-          <html lang="en">
+          <html lang="en" suppressHydrationWarning>
             <head>
               <title>2Tag x MetaMove</title>
               <link rel="shortcut icon" href="/images/favicon.ico" />
@@ -64,41 +65,43 @@ export default function RootLayout({
               <meta name="twitter:image" content="/images/og-image.png" />
             </head>
             <body className={publicSans.className}>
-              <WalletConnectionHandler>
-                <NuqsAdapter>
-                  <div className="bg-secondary grid grid-rows-[auto,1fr] h-[100dvh]">
-                    <div className="grid grid-cols-[1fr,auto] gap-2 p-4">
-                      <div className="flex gap-4 flex-col md:flex-row md:items-center justify-between">
-                        <a
-                          href="https://www.2tag.ai"
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          className="flex items-center gap-2"
-                        >
-                          {/* <Logo /> */}
-                          <div className="flex h-full items-center">
-                            <Image
-                              src="/images/2tag-logo.png"
-                              alt="Logo"
-                              className="h-10"
-                              width={100}
-                              height={100}
-                            />
-                          </div>
-                        </a>
-                        <nav className="flex gap-1 flex-col md:flex-row">
-                          <ThemeToggle />
-                          <Wallet />
-                        </nav>
+              <ThemeProvider attribute="class">
+                <WalletConnectionHandler>
+                  <NuqsAdapter>
+                    <div className="grid grid-rows-[auto,1fr] h-[100dvh]">
+                      <div className="grid grid-cols-[1fr,auto] gap-2 p-4">
+                        <div className="flex gap-4 flex-col md:flex-row md:items-center justify-between">
+                          <a
+                            href="https://www.2tag.ai"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            className="flex items-center gap-2"
+                          >
+                            {/* <Logo /> */}
+                            <div className="flex h-full items-center">
+                              <Image
+                                src="/images/2tag-logo.png"
+                                alt="Logo"
+                                className="h-10"
+                                width={100}
+                                height={100}
+                              />
+                            </div>
+                          </a>
+                          <nav className="flex gap-1 flex-col md:flex-row">
+                            <ThemeToggle />
+                            <Wallet />
+                          </nav>
+                        </div>
+                      </div>
+                      <div className="mx-4 relative grid rounded-t-2xl border border-input border-b-0">
+                        <div className="absolute inset-0">{children}</div>
                       </div>
                     </div>
-                    <div className="bg-background mx-4 relative grid rounded-t-2xl border border-input border-b-0">
-                      <div className="absolute inset-0">{children}</div>
-                    </div>
-                  </div>
-                  <Toaster />
-                </NuqsAdapter>
-              </WalletConnectionHandler>
+                    <Toaster />
+                  </NuqsAdapter>
+                </WalletConnectionHandler>
+              </ThemeProvider>
             </body>
           </html>
         </WalletProvider>
