@@ -147,14 +147,14 @@ export async function POST(req: NextRequest) {
     });
 
     const llmWithTools = llm.bindTools(tools);
-
-    const aiMessage = await llmWithTools.invoke(messages);
+    const aiMessage = await llmWithTools.invoke(augmentedMessages);
     let parsedContent;
     try {
       parsedContent = JSON.parse(aiMessage.content.toString());
     } catch (error) {
       parsedContent = aiMessage.content; // 如果解析失敗，則保持原樣
     }
+
     messages.push({
       role: "assistant",
       content: parsedContent.messages?.content || parsedContent, // 確保只存入有效的內容
@@ -172,6 +172,24 @@ export async function POST(req: NextRequest) {
           tool: selectedTool.name,
         };
         messages.push(new_message);
+
+        const formattedTools = [
+          "get_hashtags",
+          "generate_image",
+          "two_tag_tweet_nft",
+          "get_twotag_nft",
+          "read_public_tweet",
+        ];
+
+        if (!formattedTools.includes(selectedTool.name)) {
+          console.log("toolMessage", toolMessage);
+          return NextResponse.json({
+            messages: {
+              content: parsedContent.messages?.content || parsedContent,
+              tool: null,
+            },
+          });
+        }
       }
     } else {
       return NextResponse.json({

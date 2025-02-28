@@ -163,8 +163,7 @@ export const toolsByName = {
     new AptosGetTokenDetailTool(agent),
   aptos_mint_token: (agent: AgentRuntime) => new AptosMintTokenTool(agent),
   aptos_create_token: (agent: AgentRuntime) => new AptosCreateTokenTool(agent),
-  aptos_get_token_price: (agent: AgentRuntime) =>
-    new AptosGetTokenPriceTool(agent),
+  aptos_token_price: (agent: AgentRuntime) => new AptosGetTokenPriceTool(agent),
 
   // Amnis tools
   amnis_stake: (agent: AgentRuntime) => new AmnisStakeTool(agent),
