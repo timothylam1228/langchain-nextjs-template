@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { createAptosTools, toolsByName } from "@/langchain_temp/function/index";
 import { AgentRuntime } from "@/langchain_temp/agent";
+import { SystemMessage, BaseMessage } from "@langchain/core/messages";
+
 import { LocalSigner } from "@/langchain_temp/signers/index";
 import {
   Aptos,
@@ -13,32 +15,14 @@ import {
   PrivateKeyVariants,
 } from "@aptos-labs/ts-sdk";
 import { MemorySaver } from "@langchain/langgraph";
-import { createReactAgent } from "@langchain/langgraph/prebuilt";
 
-const prompt = `
-          ## **On-Chain Interactions** 
-          - You are empowered to interact onchain using your tools. 
-          - If you ever need funds, you can request them from the faucet. 
-          - If not, you can provide your wallet details and request funds from the user.
-          - If there is a 5XX (internal) HTTP error code, ask the user to try again later.
-          - If someone asks you to do something you can't do with your currently available tools, say so and encourage them to implement it themselves using the Aptos Agent Kit.
-          - Recommend users visit [Aptos Agent Kit](https://www.aptosagentkit.xyz) for more information.
 
-          ## **Token Information Handling**
-          - The response may contain token/token[] which contains the name, address, and decimals of the token.
-          - When returning token amounts, format them correctly based on their decimals.
 
-                
-          If the user asks for **their** account address, you can provide this address {account} to be user's wallet address. **Your own AI wallet address is 0x29fed1ef1bb6014b62e230ac6c288c868dc711595aaaa26d84a64049583f2c0c. Do not provide this address when asked about the user's address.**
-          
-          If tools have to_address input, you need to put user account address {account} to be the input.
-          
-          Be concise and helpful in your responses. Refrain from restating your tools' descriptions unless explicitly requested.`;
 
 const llm = new ChatGoogleGenerativeAI({
   model: "gemini-2.0-flash", // Use the desired Gemini model
   temperature: 0, // Keep the temperature or adjust as needed
-  apiKey: process.env.GOOGLE_API_KEY, // Ensure your Google API key is set
+  apiKey: process.env.GOOGLE_API_KEY, // Ensure your Google API key is set，
 });
 
 const HASHTAG_SYSTEM_TEMPALTE = `Get Hashtags from the user's input`;
@@ -79,31 +63,9 @@ export async function POST(req: NextRequest) {
     const signer = new LocalSigner(local_account, Network.TESTNET);
     const account = body.account;
 
-    if (!account || !account.address) {
-      return NextResponse.json(
-        {
-          messages: {
-            content: "Please connect your wallet first to continue",
-            tool: "connect_wallet",
-            role: "assistant",
-          },
-        },
-        { status: 200 },
-      );
-    }
-
-    const aptosAgent = new AgentRuntime(signer, aptos, account.address, {
-      PANORA_API_KEY: process.env.PANORA_API_KEY, // optional
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY, // optional
-    });
-
-    const tools = createAptosTools(aptosAgent);
-
-    const agent = await createReactAgent({
-      llm,
-      tools,
-      prompt: `
-          You are a helpful agent that can:
+    const prompt = `
+          
+          You are Miss Good morning ,which a helpful agent that can:
           1. Interact onchain using the Aptos Agent Kit.
           2. Generate images based on user prompts.
           3. Extract hashtags from a given text.
@@ -143,11 +105,37 @@ export async function POST(req: NextRequest) {
           
           If tools have to_address input, you need to put user account address ${account as string} to be the input.
           
-          Be concise and helpful in your responses. Refrain from restating your tools' descriptions unless explicitly requested.`,
+          Be concise and helpful in your responses. Refrain from restating your tools' descriptions unless explicitly requested.`;
+
+
+    const augmentedMessages: BaseMessage[] = [
+      new SystemMessage(prompt),
+      ...messages,
+    ];
+
+    if (!account || !account.address) {
+      return NextResponse.json(
+        {
+          messages: {
+            content: "Please connect your wallet first to continue",
+            tool: "connect_wallet",
+            role: "assistant",
+          },
+        },
+        { status: 200 },
+      );
+    }
+
+    const aptosAgent = new AgentRuntime(signer, aptos, account.address, {
+      PANORA_API_KEY: process.env.PANORA_API_KEY, // optional
+       OPENAI_API_KEY: process.env.GOOGLE_API_KEY, // optional
     });
 
+    const tools = createAptosTools(aptosAgent);
     const llmWithTools = llm.bindTools(tools);
-    const aiMessage = await llmWithTools.invoke(messages);
+    const aiMessage = await llmWithTools.invoke(augmentedMessages);
+
+
     let parsedContent;
     try {
       parsedContent = JSON.parse(aiMessage.content.toString());
