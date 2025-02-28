@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
     });
 
     const llmWithTools = llm.bindTools(tools);
-    const aiMessage = await llmWithTools.invoke(augmentedMessages);
+    const aiMessage = await llmWithTools.invoke(messages);
     let parsedContent;
     try {
       parsedContent = JSON.parse(aiMessage.content.toString());
