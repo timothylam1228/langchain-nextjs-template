@@ -23,8 +23,6 @@ interface FormattedNFTData {
   token_id: string;
   token_uri: string;
   token_name: string;
-  collection_description: string;
-  collection_uri: string;
 }
 export async function get_twotag_nft(
   agent: AgentRuntime,
@@ -36,9 +34,9 @@ export async function get_twotag_nft(
           where: {
             owner_address: { _eq: "${to}" }
             current_token_data: {
-        collection_id: { _eq: "0x8e48ee91ad8e73200bc24e3a5c415a9b470cd3292480031857c42b24b5153bbd" }
-      }
-    }
+              collection_id: { _eq: "0x8e48ee91ad8e73200bc24e3a5c415a9b470cd3292480031857c42b24b5153bbd" }
+            }
+          }
       ) {
         current_token_data {
           token_data_id
@@ -75,6 +73,8 @@ export async function get_twotag_nft(
   }
   try {
     const graphqlData = await fetchGraphQL(operations, "MyQuery", {});
+
+    console.log("graphqlData", graphqlData);
     // const graphqlData = JSON.parse(Data)
 
     // Extract and format data
@@ -89,15 +89,12 @@ export async function get_twotag_nft(
           token_id: ownership.current_token_data.token_data_id,
           token_uri: ownership.current_token_data.token_uri,
           token_name: ownership.current_token_data.token_name,
-          collection_description: collectionData[0]?.description || "", // Handle cases where collection data might be missing
-          collection_uri: collectionData[0]?.uri || "",
         };
       },
     );
 
     return formattedData;
   } catch (error: any) {
-    console.error("Error in get_twotag_nft:", error);
-    throw new Error(`2tag get nft failed: ${error.message}`);
+    return [];
   }
 }

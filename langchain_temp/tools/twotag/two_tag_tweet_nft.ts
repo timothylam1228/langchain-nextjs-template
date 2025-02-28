@@ -60,7 +60,7 @@ export async function two_tag_tweet_nft(
       //const externalApiData = await externalApiResponse.json();
 
       const hashtagsResponse = await fetch(
-        `https://essaa-creatolens-hashtag-service-sit-398252563427.asia-east2.run.app/predict?input=${keywords}&key=${account}&k=5`,
+        `https://essaa-creatolens-hashtag-service-sit-398252563427.asia-east2.run.app/predict?input=${keywords}&key=${account}&k=10`,
         {
           method: "GET",
         },

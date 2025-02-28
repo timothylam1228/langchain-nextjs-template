@@ -135,7 +135,6 @@ export async function POST(req: NextRequest) {
     const llmWithTools = llm.bindTools(tools);
     const aiMessage = await llmWithTools.invoke(augmentedMessages);
 
-    console.log("messages", messages);
 
     let parsedContent;
     try {
@@ -143,6 +142,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       parsedContent = aiMessage.content; // 如果解析失敗，則保持原樣
     }
+
     messages.push({
       role: "assistant",
       content: parsedContent.messages?.content || parsedContent, // 確保只存入有效的內容
@@ -160,6 +160,24 @@ export async function POST(req: NextRequest) {
           tool: selectedTool.name,
         };
         messages.push(new_message);
+
+        const formattedTools = [
+          "get_hashtags",
+          "generate_image",
+          "two_tag_tweet_nft",
+          "get_twotag_nft",
+          "read_public_tweet",
+        ];
+
+        if (!formattedTools.includes(selectedTool.name)) {
+          console.log("toolMessage", toolMessage);
+          return NextResponse.json({
+            messages: {
+              content: parsedContent.messages?.content || parsedContent,
+              tool: null,
+            },
+          });
+        }
       }
     } else {
       return NextResponse.json({
@@ -173,7 +191,6 @@ export async function POST(req: NextRequest) {
     const agentMessage = messages[messages.length - 1];
     // return the message from the agent
 
-    console.log("agentMessage", agentMessage.content);
     return NextResponse.json({
       messages: {
         content: agentMessage.content,

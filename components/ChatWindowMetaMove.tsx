@@ -24,6 +24,7 @@ import {
 import { cn } from "@/utils/cn";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { ChatMessageMetaMove } from "./ChatMessageMetaMove";
+import { useTheme } from "next-themes";
 
 function ChatMessages(props: {
   messages: Message[];
@@ -33,7 +34,6 @@ function ChatMessages(props: {
   className?: string;
   tool?: string;
 }) {
-  console.log("props.messages", props.messages);
   return (
     <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
       {props.messages.map((m, i) => {
@@ -206,7 +206,7 @@ export function ChatWindowMetaMove(props: {
     Record<string, any>
   >({});
   const { account } = useWallet();
-
+  const { theme } = useTheme();
   const chat = useChat({
     api: props.endpoint,
     body: {
@@ -263,7 +263,6 @@ export function ChatWindowMetaMove(props: {
     });
     const json = await response.json();
     setIntermediateStepsLoading(false);
-    console.log("json", json);
 
     if (!response.ok) {
       toast.error(`Error while processing your request`, {
@@ -329,12 +328,12 @@ export function ChatWindowMetaMove(props: {
                 <Button
                   key={index}
                   variant="outline"
-                  className="w-full min-h-[120px] p-4 h-auto text-left flex flex-col items-start gap-2 hover:bg-secondary/80 transition-colors overflow-hidden"
+                  className="w-full min-h-[120px] p-4 h-auto text-left flex flex-col items-start gap-2 hover:bg-secondary/80 transition-colors overflow-hidden border-border"
                   onClick={() => {
                     chat.setInput(preset.value);
                   }}
                 >
-                  <span className="font-semibold text-base w-full break-words">
+                  <span className="font-semibold text-base w-full break-words text-foreground">
                     {preset.label}
                   </span>
                   <span className="text-sm text-muted-foreground w-full flex-wrap line-clamp-2 whitespace-pre-wrap">
