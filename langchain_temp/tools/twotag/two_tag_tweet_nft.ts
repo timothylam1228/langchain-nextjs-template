@@ -107,10 +107,7 @@ export async function two_tag_tweet_nft(
       });
 
       if (!signedTransaction.success) {
-        console.error(signedTransaction, "2tag post tweet failed");
         throw new Error("2tag post tweet failed");
-      } else {
-        console.log("2tag post tweet success");
       }
 
       return {

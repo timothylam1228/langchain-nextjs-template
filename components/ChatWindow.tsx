@@ -240,7 +240,6 @@ export function ChatWindow(props: {
     });
     const json = await response.json();
     setIntermediateStepsLoading(false);
-    console.log("json", json);
 
     if (!response.ok) {
       toast.error(`Error while processing your request`, {

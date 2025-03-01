@@ -238,7 +238,6 @@ export function ChatWindowMetaMove(props: {
     if (chat.isLoading || intermediateStepsLoading) return;
 
     if (!showIntermediateSteps) {
-      console.log("not show intermediate steps");
       chat.handleSubmit(e);
       return;
     }

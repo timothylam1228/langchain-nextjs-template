@@ -97,7 +97,6 @@ export const parseContentToJson = (message: Message) => {
 
       case "get_twotag_tweet":
         const formattedData = JSON.parse(content.messages.content);
-        console.log("get_twotag_tweet formattedData", formattedData);
         return (
           <div>
             <div className="flex flex-row gap-4 flex-wrap">
@@ -127,7 +126,6 @@ export const parseContentToJson = (message: Message) => {
         );
 
       case "two_tag_tweet_nft":
-        console.log("two_tag_tweet_nft", content);
         return (
           <div>
             <Image
@@ -180,11 +178,9 @@ export const parseContentToJson = (message: Message) => {
 
       default:
         try {
-          console.log("default", content.messages.content);
           const jsonContent = JSON.parse(content.messages.content);
           return <div>{jsonContent.content}</div>;
         } catch (error) {
-          console.log("error", error, content.messages.content);
           // Don't try to parse JSON again if it failed the first time
           return <div>{content.messages.content}</div>;
         }
