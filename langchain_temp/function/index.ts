@@ -52,7 +52,7 @@ import {
   ThalaStakeTokenTool,
   ThalaUnstakeTokenTool,
 } from "./thala";
-import { GetTwotagNFT } from "./twotag/get_twotag_tweet";
+import { GetTwotagNFT } from "./twotag/get_twotag_nft";
 import { TweetNFTTool } from "./twotag/two_tag_tweet_nft";
 import { Read_public_tweet } from "./twotag/read_public_tweet";
 import { GetHashtags } from "./twotag/get_hashtags";
@@ -147,7 +147,7 @@ export * from "./twotag";
 export const toolsByName = {
   get_hashtags: (agent: AgentRuntime) => new GetHashtags(agent),
   generate_image: (agent: AgentRuntime) => new GenerateImage(agent),
-  get_twotag_tweet: (agent: AgentRuntime) => new GetTwotagNFT(agent),
+  get_twotag_nft: (agent: AgentRuntime) => new GetTwotagNFT(agent),
   read_public_tweet: (agent: AgentRuntime) => new Read_public_tweet(agent),
   two_tag_tweet_nft: (agent: AgentRuntime) => new TweetNFTTool(agent),
 

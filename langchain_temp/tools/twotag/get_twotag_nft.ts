@@ -19,7 +19,7 @@ interface CollectionData {
   description: string;
   uri: string;
 }
-interface FormattedNFTData {
+export interface FormattedNFTData {
   token_id: string;
   token_uri: string;
   token_name: string;
@@ -64,7 +64,6 @@ export async function get_twotag_nft(
         }),
       });
       const result = await response.json();
-      //console.log("GraphQL Result:", result);
       return result;
     } catch (e: unknown) {
       console.log(e);
@@ -92,7 +91,6 @@ export async function get_twotag_nft(
         };
       },
     );
-
     return formattedData;
   } catch (error: any) {
     return [];

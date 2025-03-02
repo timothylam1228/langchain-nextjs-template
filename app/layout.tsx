@@ -65,7 +65,7 @@ export default function RootLayout({
               <meta name="twitter:image" content="/images/og-image.png" />
             </head>
             <body className={publicSans.className}>
-              <ThemeProvider attribute="class">
+              <ThemeProvider attribute="class" defaultTheme="light">
                 <WalletConnectionHandler>
                   <NuqsAdapter>
                     <div className="grid grid-rows-[auto,1fr] h-[100dvh]">

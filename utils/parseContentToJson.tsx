@@ -95,13 +95,14 @@ export const parseContentToJson = (message: Message) => {
           </div>
         );
 
-      case "get_twotag_tweet":
-        const formattedData = JSON.parse(content.messages.content);
+      case "get_twotag_nft":
+
+        const formattedData = content.messages.content;
         return (
           <div>
             <div className="flex flex-row gap-4 flex-wrap">
-              {formattedData.nfts.length > 0 ? (
-                formattedData.nfts.map((nft: any) => (
+              {formattedData.length > 0 ? (
+                formattedData.map((nft: any) => (
                   <div
                     key={nft.token_id}
                     className="border border-gray-300 rounded-lg p-2"

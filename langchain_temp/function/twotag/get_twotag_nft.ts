@@ -1,5 +1,6 @@
 import { Tool } from "langchain/tools";
 import { type AgentRuntime } from "../../agent";
+import { FormattedNFTData } from "@/langchain_temp/tools/twotag/get_twotag_nft";
 
 /**
  * get user address 2tag nft
@@ -7,7 +8,7 @@ import { type AgentRuntime } from "../../agent";
  */
 
 export class GetTwotagNFT extends Tool {
-  name = "get_twotag_tweet";
+  name = "get_twotag_nft";
   description = `
     This tool retrieves all TwoTag Tweet NFTs owned by the user from their wallet.
     
@@ -32,18 +33,13 @@ export class GetTwotagNFT extends Tool {
     super();
   }
 
-  async _call(): Promise<string> {
+  async _call(): Promise<FormattedNFTData[]> {
     try {
       const nftData = await this.agent.get_twotag_nft();
-
-      return JSON.stringify({
-        nfts: nftData,
-      });
+      return nftData;
     } catch (error: any) {
       console.error("Error retrieving Tweet NFTs:", error);
-      return JSON.stringify({
-        error: `Error retrieving Tweet NFTs: ${error.message}`,
-      });
+      return [];
     }
   }
 }

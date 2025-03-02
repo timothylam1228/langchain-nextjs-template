@@ -113,12 +113,14 @@ const handleAIResponse = async (
       const toolResponse = await selectedTool(aptosAgent).invoke(toolCall);
 
       if (!formattedTools.includes(selectedTool.name)) {
-        return parsedContent;
+        return { tool: null, response: parsedContent };
+      } else {
+        return { tool: selectedTool.name, response: toolResponse };
       }
     }
   }
 
-  return parsedContent;
+  return { tool: null, response: parsedContent };
 };
 
 // **POST Handler**
@@ -155,7 +157,7 @@ export async function POST(req: NextRequest) {
       ...messages,
     ];
 
-    const responseContent = await handleAIResponse(
+    const { tool, response } = await handleAIResponse(
       augmentedMessages,
       aptosAgent,
       tools,
@@ -163,8 +165,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       messages: {
-        content: responseContent.messages?.content || responseContent,
-        tool: null,
+        content: response.messages?.content || response,
+        tool: tool,
       },
     });
   } catch (error: any) {
