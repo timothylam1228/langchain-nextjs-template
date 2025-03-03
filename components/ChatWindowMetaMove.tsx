@@ -2,7 +2,7 @@
 
 import { type Message } from "ai";
 import { useChat } from "ai/react";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { toast } from "sonner";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
@@ -25,6 +25,8 @@ import { cn } from "@/utils/cn";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { ChatMessageMetaMove } from "./ChatMessageMetaMove";
 import { useTheme } from "next-themes";
+import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import { TransactionState } from "./hooks/useChain";
 
 function ChatMessages(props: {
   messages: Message[];
@@ -33,6 +35,7 @@ function ChatMessages(props: {
   aiEmoji?: string;
   className?: string;
   tool?: string;
+  transactionState?: TransactionState;
 }) {
   return (
     <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
@@ -65,6 +68,12 @@ export function ChatInput(props: {
   children?: ReactNode;
   className?: string;
   actions?: ReactNode;
+  transactionState?: {
+    isSubmitting: boolean;
+    transactionHash: string | null;
+    deployMessage: string | null;
+    error: string | null;
+  };
 }) {
   const disabled = props.loading && props.onStop == null;
   return (
@@ -183,6 +192,11 @@ export function ChatWindowMetaMove(props: {
   const [intermediateStepsLoading, setIntermediateStepsLoading] =
     useState(false);
 
+  const transactionProcessedRef = useRef<Set<string>>(new Set());
+  const [lastProcessedMessageId, setLastProcessedMessageId] = useState<
+    string | null
+  >(null);
+
   const presetInputs = [
     {
       label: "🎯 Generate Hashtags",
@@ -198,7 +212,8 @@ export function ChatWindowMetaMove(props: {
     },
     {
       label: "🤔 View NFTs",
-      value: "View NFTs on Aptos",
+      value:
+        "tranfer my 0.02 aptos to address 0x31204316fb721b16081d3daf3ac62b9df8bfefbef16c13586c8cef7a1a84c757",
     },
   ];
 
@@ -232,6 +247,8 @@ export function ChatWindowMetaMove(props: {
         description: e.message,
       }),
   });
+
+  // Improved transaction processing logic
 
   async function sendMessage(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();

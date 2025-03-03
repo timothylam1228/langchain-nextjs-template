@@ -1,9 +1,13 @@
 import type { Message } from "ai/react";
+import type { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
+import { type FC, useEffect, useRef } from "react";
 import HashtagsView from "@/components/HashtagsView";
 import Image from "next/image";
 import Wallet from "@/components/wallet/client_wallet";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { TransactionCode } from "@/enum/TransactionCode";
+import { TransactionState } from "@/components/hooks/useChain";
 
 export const shareToTwitter = (tweet: string, url?: string) => {
   const tweetText = encodeURIComponent(tweet.replace(/&|@/g, ""));
@@ -61,9 +65,21 @@ const copyTweetToClipboard = async (tweet: string, image?: string) => {
   }
 };
 
-export const parseContentToJson = (message: Message) => {
-  if (!message?.content) return;
-  if (message.role !== "assistant") return message.content;
+interface ContentParserProps {
+  message: Message;
+  transactionState?: TransactionState;
+  aptos: any;
+  setDeployMessage: (message: string | undefined) => void;
+}
+
+export const ContentParser: React.FC<ContentParserProps> = ({
+  message,
+  transactionState,
+}) => {
+  const hasSubmittedRef = useRef(false);
+
+  if (!message?.content) return null;
+  if (message.role !== "assistant") return <div>{message.content}</div>;
 
   try {
     const content = JSON.parse(message.content);
@@ -96,7 +112,6 @@ export const parseContentToJson = (message: Message) => {
         );
 
       case "get_twotag_nft":
-
         const formattedData = content.messages.content;
         return (
           <div>
@@ -177,6 +192,41 @@ export const parseContentToJson = (message: Message) => {
           </div>
         );
 
+      case "aptos_transfer_token":
+        // Don't call submitToChain here - just display the transaction info
+        console.log("transactionState", transactionState);
+
+        if (!transactionState) {
+          return <div>Transaction state not found</div>;
+        }
+
+        const { transactionHash, code } = transactionState;
+
+        if (code === TransactionCode.USER_REJECTED) {
+          return <div>Transaction rejected by user</div>;
+        }
+
+        if (code === TransactionCode.TRANSACTION_ALREADY_IN_PROGRESS) {
+          return <div>Transaction already in progress</div>;
+        }
+
+        if (code === TransactionCode.TRANSACTION_FAILED) {
+          return <div>Transaction failed</div>;
+        }
+
+        if (code === TransactionCode.TRANSACTION_SUCCESS) {
+          return (
+            <div>
+              Transaction successful
+              <div>transactionHash: {transactionHash}</div>
+            </div>
+          );
+        }
+
+        if (code === TransactionCode.TRANSACTION_PENDING) {
+          return <div>Transaction pending</div>;
+        }
+
       default:
         try {
           const jsonContent = JSON.parse(content.messages.content);
@@ -188,6 +238,6 @@ export const parseContentToJson = (message: Message) => {
     }
   } catch (error) {
     console.error("Error parsing message content:", error);
-    return message.content;
+    return <div>{message.content}</div>;
   }
 };

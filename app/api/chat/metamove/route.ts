@@ -22,6 +22,7 @@ const formattedTools = [
   "get_twotag_nft",
   "read_public_tweet",
   "aptos_get_wallet_address",
+  "aptos_transfer_token",
 ];
 
 // Initialize LLM
@@ -98,6 +99,7 @@ const handleAIResponse = async (
   const llmWithTools = llm.bindTools(tools);
   const aiMessage = await llmWithTools.invoke(messages);
 
+  console.log("aiMessage", aiMessage);
   let parsedContent;
   try {
     parsedContent = JSON.parse(aiMessage.content.toString());

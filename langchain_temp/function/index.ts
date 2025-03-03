@@ -57,6 +57,7 @@ import { TweetNFTTool } from "./twotag/two_tag_tweet_nft";
 import { Read_public_tweet } from "./twotag/read_public_tweet";
 import { GetHashtags } from "./twotag/get_hashtags";
 import { GenerateImage } from "./twotag/generate_image";
+import { AptosTransferNFTTool } from "./aptos/transfer-nft";
 
 export const createAptosTools = (
   agent: AgentRuntime,
@@ -69,7 +70,7 @@ export const createAptosTools = (
     new AptosTransferTokenTool(agent),
     // new AptosBurnNFTTool(agent),
     new AptosBurnTokenTool(agent),
-    // new AptosTransferNFTTool(agent),
+    new AptosTransferNFTTool(agent),
     new AptosTransactionTool(agent),
     new AptosGetTokenDetailTool(agent),
     new AptosMintTokenTool(agent),
@@ -157,6 +158,8 @@ export const toolsByName = {
     new AptosAccountAddressTool(agent),
   aptos_transfer_token: (agent: AgentRuntime) =>
     new AptosTransferTokenTool(agent),
+  aptos_transfer_nft: (agent: AgentRuntime) =>
+    new AptosTransferNFTTool(agent),
   aptos_burn_token: (agent: AgentRuntime) => new AptosBurnTokenTool(agent),
   aptos_transaction: (agent: AgentRuntime) => new AptosTransactionTool(agent),
   aptos_get_token_detail: (agent: AgentRuntime) =>
