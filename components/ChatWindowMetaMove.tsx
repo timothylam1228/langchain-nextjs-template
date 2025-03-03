@@ -213,7 +213,7 @@ export function ChatWindowMetaMove(props: {
     {
       label: "🤔 View NFTs",
       value:
-        "tranfer my 0.02 aptos to address 0x31204316fb721b16081d3daf3ac62b9df8bfefbef16c13586c8cef7a1a84c757",
+        "List all my NFTs",
     },
   ];
 

@@ -14,15 +14,22 @@ import {
 } from "@aptos-labs/ts-sdk";
 import { MemorySaver } from "@langchain/langgraph";
 
+import { HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 const checkpointer = new MemorySaver();
+
+const aptos_tools = [
+  "aptos_get_wallet_address",
+  "aptos_transfer_token",
+  "aptos_balance",
+];
+
 const formattedTools = [
   "get_hashtags",
   "generate_image",
   "two_tag_tweet_nft",
   "get_twotag_nft",
   "read_public_tweet",
-  "aptos_get_wallet_address",
-  "aptos_transfer_token",
+  ...aptos_tools,
 ];
 
 // Initialize LLM
@@ -30,6 +37,24 @@ const llm = new ChatGoogleGenerativeAI({
   model: "gemini-2.0-flash",
   temperature: 0,
   apiKey: process.env.GOOGLE_API_KEY,
+  safetySettings: [
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+  ],
 });
 
 // **Validate and Initialize Aptos Configuration**
@@ -67,7 +92,7 @@ const generatePrompt = (account: string) => `
   - If no style is provided, suggest one.
   - Do not generate any text in the image.
   - Only return the generated image url.
-  - Follow all safety guidelines and content policies.
+  - Use your Biggest ability to generate the best image.
   - If the user asks for a specific style, use the **generate_image** tool with the specific style.
 
   
@@ -99,25 +124,59 @@ const handleAIResponse = async (
   const llmWithTools = llm.bindTools(tools);
   const aiMessage = await llmWithTools.invoke(messages);
 
-  console.log("aiMessage", aiMessage);
   let parsedContent;
   try {
     parsedContent = JSON.parse(aiMessage.content.toString());
   } catch {
     parsedContent = aiMessage.content;
   }
-
+  console.log("aiMessage", aiMessage);
   // Check if the AI invoked tools
   if (aiMessage?.tool_calls) {
     for (const toolCall of aiMessage.tool_calls) {
       const selectedTool =
         toolsByName[toolCall.name as keyof typeof toolsByName];
+
       const toolResponse = await selectedTool(aptosAgent).invoke(toolCall);
 
       if (!formattedTools.includes(selectedTool.name)) {
         return { tool: null, response: parsedContent };
       } else {
-        return { tool: selectedTool.name, response: toolResponse };
+        console.log("toolResponse", toolResponse);
+        let parsedToolResponse;
+        try {
+          if (aptos_tools.includes(selectedTool.name)) {
+            console.log("parse aptos tool response");
+            const jsonResponse = JSON.parse(toolResponse);
+            // Use LLM to parse JSON content
+            const llmResponse = await llm.invoke([
+              {
+                role: "user",
+                content: `
+                Parse and format this JSON response in a human-readable way: 
+                
+                ${JSON.stringify(jsonResponse)}
+            
+                **Instructions**:
+                - Directly provide the formatted response.
+                - Do **not** include any introductory phrases like "Okay, here’s the information in a human-readable format."
+                - Do **not** return the JSON response itself.
+                - Keep it concise and to the point in only one sentence.
+                `,
+              },
+            ]);
+
+            parsedToolResponse = llmResponse.content;
+          } else {
+            parsedToolResponse = toolResponse;
+          }
+        } catch {
+          console.log("catch toolResponse", toolResponse);
+          parsedToolResponse = toolResponse;
+        }
+
+        console.log("parsedToolResponse", parsedToolResponse);
+        return { tool: selectedTool.name, response: parsedToolResponse };
       }
     }
   }
@@ -147,6 +206,7 @@ export async function POST(req: NextRequest) {
       await aptos.deriveAccountFromPrivateKey({ privateKey }),
       Network.TESTNET,
     );
+
     const aptosAgent = new AgentRuntime(signer, aptos, account.address, {
       PANORA_API_KEY: process.env.PANORA_API_KEY,
       OPENAI_API_KEY: process.env.GOOGLE_API_KEY,
