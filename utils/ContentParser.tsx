@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { TransactionCode } from "@/enum/TransactionCode";
 import { TransactionState } from "@/components/hooks/useChain";
+import { Tweet } from "@/langchain_temp/function/twotag/get_twotag_nft";
 
 export const shareToTwitter = (tweet: string, url?: string) => {
   const tweetText = encodeURIComponent(tweet.replace(/&|@/g, ""));
@@ -112,26 +113,41 @@ export const ContentParser: React.FC<ContentParserProps> = ({
         );
 
       case "get_twotag_nft":
-        const formattedData = content.messages.content;
+        const formattedData: Tweet[] = content.messages.content;
         return (
-          <div>
-            <div className="flex flex-row gap-4 flex-wrap">
+          <div className="w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {formattedData.length > 0 ? (
-                formattedData.map((nft: any) => (
+                formattedData.map((nft: Tweet) => (
                   <div
                     key={nft.token_id}
                     className="border border-gray-300 rounded-lg p-2"
                   >
-                    {nft.token_uri && (
-                      <Image
-                        src={nft.token_uri}
-                        alt={nft.token_name}
-                        width={200}
-                        height={200}
-                        className="rounded-lg"
-                      />
+                    {nft.token_uri ? (
+                      <div className="relative min-h-40 w-full flex ">
+                        {/* Ensure token_uri is a valid URL */}
+                        <Image
+                          src={
+                            nft.token_uri.startsWith("http")
+                              ? nft.token_uri
+                              : "/placeholder.jpg"
+                          }
+                          alt={nft.token_name || "NFT Image"}
+                          width={300}
+                          height={300}
+                          className="rounded-lg mb-2 object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">Image not available</p>
                     )}
-                    <p>{nft.token_name}</p>
+                    <p className="line-clamp-2 text-sm">{nft.text}</p>
+                    <p className="truncate line-clamp-2 text-blue-500">
+                      {nft.tag.map((tag) => `#${tag}`).join(" ")}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(nft.deploy_Date * 1000).toLocaleDateString()}
+                    </p>
                   </div>
                 ))
               ) : (
@@ -194,7 +210,6 @@ export const ContentParser: React.FC<ContentParserProps> = ({
 
       case "aptos_transfer_token":
         // Don't call submitToChain here - just display the transaction info
-        console.log("transactionState", transactionState);
 
         if (!transactionState) {
           return <div>Transaction state not found</div>;

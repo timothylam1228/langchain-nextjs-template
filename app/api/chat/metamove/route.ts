@@ -130,7 +130,6 @@ const handleAIResponse = async (
   } catch {
     parsedContent = aiMessage.content;
   }
-  console.log("aiMessage", aiMessage);
   // Check if the AI invoked tools
   if (aiMessage?.tool_calls) {
     for (const toolCall of aiMessage.tool_calls) {
@@ -142,11 +141,9 @@ const handleAIResponse = async (
       if (!formattedTools.includes(selectedTool.name)) {
         return { tool: null, response: parsedContent };
       } else {
-        console.log("toolResponse", toolResponse);
         let parsedToolResponse;
         try {
           if (aptos_tools.includes(selectedTool.name)) {
-            console.log("parse aptos tool response");
             const jsonResponse = JSON.parse(toolResponse);
             // Use LLM to parse JSON content
             const llmResponse = await llm.invoke([
@@ -171,11 +168,9 @@ const handleAIResponse = async (
             parsedToolResponse = toolResponse;
           }
         } catch {
-          console.log("catch toolResponse", toolResponse);
           parsedToolResponse = toolResponse;
         }
 
-        console.log("parsedToolResponse", parsedToolResponse);
         return { tool: selectedTool.name, response: parsedToolResponse };
       }
     }

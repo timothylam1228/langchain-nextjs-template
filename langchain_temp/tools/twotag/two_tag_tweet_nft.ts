@@ -86,7 +86,6 @@ export async function two_tag_tweet_nft(
       const imageUrl = (await response.json()).image_url;
 
       const tweetContent = await generateTweet(llm, result);
-      // console.log("tweetContent:", tweetContent);
 
       const output = tweetContent + imageUrl;
 

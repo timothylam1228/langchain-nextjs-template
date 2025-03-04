@@ -73,7 +73,6 @@ export async function get_twotag_nft(
   try {
     const graphqlData = await fetchGraphQL(operations, "MyQuery", {});
 
-    console.log("graphqlData", graphqlData);
     // const graphqlData = JSON.parse(Data)
 
     // Extract and format data

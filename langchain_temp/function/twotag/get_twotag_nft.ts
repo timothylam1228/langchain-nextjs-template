@@ -33,13 +33,65 @@ export class GetTwotagNFT extends Tool {
     super();
   }
 
-  async _call(): Promise<FormattedNFTData[]> {
+  async _call(): Promise<Tweet[]> {
     try {
       const nftData = await this.agent.get_twotag_nft();
-      return nftData;
+      const tweets = await Promise.all(
+        nftData.map((nft) => fetch_single_tweet(this.agent, nft.token_id)),
+      );
+
+      // Combine NFT data with tweet data
+      const combinedData = tweets.map((tweet, index) => {
+        return {
+          ...tweet,
+          token_id: nftData[index].token_id,
+          token_uri: nftData[index].token_uri,
+          token_name: nftData[index].token_name,
+        };
+      });
+
+      return combinedData;
     } catch (error: any) {
       console.error("Error retrieving Tweet NFTs:", error);
       return [];
     }
   }
+}
+
+export interface Tweet {
+  deploy_Date: number;
+  owner: string;
+  text: string;
+  tag: string[];
+  token_id: string;
+  token_uri: string;
+  token_name: string;
+}
+
+async function fetch_single_tweet(
+  agent: AgentRuntime,
+  nft_token_id: string,
+): Promise<Tweet> {
+  try {
+    let respone = await agent.aptos.view({
+      payload: {
+        function:
+          "0xac314e37a527f927ee7600ac704b1ee76ff95ed4d21b0b7df1c58be8872da8f0::post::read_public_tweet",
+        functionArguments: [nft_token_id],
+      },
+    });
+    return respone[0] as Tweet;
+  } catch (e: unknown) {
+    console.log(e);
+  }
+
+  return {
+    deploy_Date: 0,
+    owner: "",
+    text: "",
+    tag: [],
+    token_id: "",
+    token_uri: "",
+    token_name: "",
+  };
 }
