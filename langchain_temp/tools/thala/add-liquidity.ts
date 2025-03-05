@@ -1,5 +1,6 @@
 import type { MoveStructId } from "@aptos-labs/ts-sdk";
 import type { AgentRuntime } from "../../agent";
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Add liquidity to Thala pool
@@ -16,11 +17,11 @@ export async function addLiquidityWithThala(
   mintTypeY: MoveStructId,
   mintXAmount: number,
   mintYAmount: number,
-): Promise<string> {
+): Promise<InputTransactionData> {
   try {
-    const transaction = await agent.aptos.transaction.build.simple({
-      sender: agent.account.getAddress(),
-      data: {
+
+
+    return {data: {
         function:
           "0x48271d39d0b05bd6efca2278f22277d6fcc375504f9839fd73f74ace240861af::weighted_pool_scripts::add_liquidity",
         typeArguments: [
@@ -34,22 +35,7 @@ export async function addLiquidityWithThala(
           "0x48271d39d0b05bd6efca2278f22277d6fcc375504f9839fd73f74ace240861af::base_pool::Null",
         ],
         functionArguments: [mintXAmount, mintYAmount, 0, 0, 0, 0, 0, 0],
-      },
-    });
-
-    const committedTransactionHash =
-      await agent.account.sendTransaction(transaction);
-
-    const signedTransaction = await agent.aptos.waitForTransaction({
-      transactionHash: committedTransactionHash,
-    });
-
-    if (!signedTransaction.success) {
-      console.error(signedTransaction, "Add liquidity failed");
-      throw new Error("Add liquidity failed");
-    }
-
-    return signedTransaction.hash;
+      }};
   } catch (error: any) {
     throw new Error(`Add liquidity failed: ${error.message}`);
   }

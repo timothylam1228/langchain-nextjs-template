@@ -1,5 +1,6 @@
-import { type AccountAddress, Aptos, AptosConfig } from "@aptos-labs/ts-sdk";
-import type { AgentRuntime } from "../../agent";
+import { type AccountAddress, Aptos, AptosConfig } from "@aptos-labs/ts-sdk"
+import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Transfer NFT
@@ -9,34 +10,20 @@ import type { AgentRuntime } from "../../agent";
  * @returns Transaction signature
  */
 export async function transferNFT(
-  agent: AgentRuntime, // Replace with the actual type of the move-agent
-  to: AccountAddress,
-  mint: AccountAddress,
-): Promise<string> {
-  return "";
-  // try {
-  //   const transaction = await agent.aptos.transferDigitalAssetTransaction({
-  //     sender: agent.account.getAddress(),
-  //     digitalAssetAddress: mint,
-  //     recipient: to,
-  //   });
-
-  //   const committedTransaction = await agent.aptos.signAndSubmitTransaction({
-  //     signer: agent.account,
-  //     transaction,
-  //   });
-
-  //   const signedTransaction = await agent.aptos.waitForTransaction({
-  //     transactionHash: committedTransaction.hash,
-  //   });
-
-  //   if (!signedTransaction.success) {
-  //     console.error(signedTransaction, "NFT transfer failed");
-  //     throw new Error("NFT transfer failed");
-  //   }
-
-  //   return signedTransaction.hash;
-  // } catch (error: unknown) {
-  //   throw new Error(`NFT transfer failed: ${error.message}`);
-  // }
+	agent: AgentRuntime, // Replace with the actual type of the move-agent
+	to: AccountAddress,
+	mint: AccountAddress
+):Promise<InputTransactionData> {
+		const ootput:InputTransactionData={
+			data:{
+				function:"0x1::object::transfer",
+				typeArguments:["0x4::token::Token"],
+				functionArguments:[mint,to]
+			}
+		}
+	 try {
+	   return ootput;
+	 } catch (error: unknown) {
+	   throw new Error(`NFT transfer failed: ${error}`);
+	 }
 }

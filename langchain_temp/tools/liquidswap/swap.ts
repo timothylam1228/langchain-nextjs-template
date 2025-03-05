@@ -1,5 +1,6 @@
 import { type MoveStructId, convertAmountFromHumanReadableToOnChain } from "@aptos-labs/ts-sdk"
 import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Swap tokens in liquidswap
@@ -16,11 +17,10 @@ export async function swap(
 	mintY: MoveStructId,
 	swapAmount: number,
 	minCoinOut = 0
-): Promise<string> {
+): Promise<InputTransactionData> {
 	try {
-		const transaction = await agent.aptos.transaction.build.simple({
-			sender: agent.account.getAddress(),
-			data: {
+
+		return {data: {
 				function: "0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12::scripts_v2::swap",
 				typeArguments: [
 					mintX,
@@ -28,21 +28,7 @@ export async function swap(
 					"0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12::curves::Uncorrelated",
 				],
 				functionArguments: [swapAmount, minCoinOut],
-			},
-		})
-
-		const committedTransactionHash = await agent.account.sendTransaction(transaction)
-
-		const signedTransaction = await agent.aptos.waitForTransaction({
-			transactionHash: committedTransactionHash,
-		})
-
-		if (!signedTransaction.success) {
-			console.error(signedTransaction, "Swap failed")
-			throw new Error("Swap failed")
-		}
-
-		return signedTransaction.hash
+			}}
 	} catch (error: any) {
 		throw new Error(`Swap failed: ${error.message}`)
 	}

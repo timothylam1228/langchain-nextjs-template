@@ -1,4 +1,5 @@
 import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Stake tokens in Echo
@@ -6,28 +7,13 @@ import type { AgentRuntime } from "../../agent"
  * @param amount Amount of token to stake
  * @returns Transaction signature
  */
-export async function stakeTokenWithEcho(agent: AgentRuntime, amount: number): Promise<string> {
+export async function stakeTokenWithEcho(agent: AgentRuntime, amount: number): Promise<InputTransactionData> {
 	try {
-		const transaction = await agent.aptos.transaction.build.simple({
-			sender: agent.account.getAddress(),
-			data: {
+
+		return {data: {
 				function: "0xa0281660ff6ca6c1b68b55fcb9b213c2276f90ad007ad27fd003cf2f3478e96e::lsdmanage::stake",
 				functionArguments: [amount],
-			},
-		})
-
-		const committedTransactionHash = await agent.account.sendTransaction(transaction)
-
-		const signedTransaction = await agent.aptos.waitForTransaction({
-			transactionHash: committedTransactionHash,
-		})
-
-		if (!signedTransaction.success) {
-			console.error(signedTransaction, "Stake token in Echo failed")
-			throw new Error("Stake token in Echo failed")
-		}
-
-		return signedTransaction.hash
+			} }
 	} catch (error: any) {
 		throw new Error(`Stake token in Echo failed: ${error.message}`)
 	}

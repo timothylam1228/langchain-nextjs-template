@@ -1,5 +1,6 @@
 import { type MoveStructId, convertAmountFromOnChainToHumanReadable } from "@aptos-labs/ts-sdk"
 import type { AgentRuntime } from "../../agent"
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Fetches balance of an aptos account

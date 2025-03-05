@@ -1,5 +1,6 @@
 import { AccountAddress, type InputGenerateTransactionPayloadData, type MoveStructId } from "@aptos-labs/ts-sdk"
 import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Repay APT, tokens or fungible asset from a position
@@ -21,44 +22,23 @@ export async function repayToken(
 	mint: MoveStructId,
 	positionId: string,
 	fungibleAsset: boolean
-): Promise<{
-	hash: string
-	positionId: string
-}> {
+): Promise<InputTransactionData> {
 	const DEFAULT_FUNCTIONAL_ARGS = [positionId, amount]
 
-	const COIN_STANDARD_DATA: InputGenerateTransactionPayloadData = {
-		function: "0x2fe576faa841347a9b1b32c869685deb75a15e3f62dfe37cbd6d52cc403a16f6::pool::repay",
-		typeArguments: [mint.toString()],
-		functionArguments: DEFAULT_FUNCTIONAL_ARGS,
-	}
+	const COIN_STANDARD_DATA: InputTransactionData= {data:{
+			function: "0x2fe576faa841347a9b1b32c869685deb75a15e3f62dfe37cbd6d52cc403a16f6::pool::repay",
+			typeArguments: [mint.toString()],
+			functionArguments: DEFAULT_FUNCTIONAL_ARGS,
+		}}
 
-	const FUNGIBLE_ASSET_DATA: InputGenerateTransactionPayloadData = {
-		function: "0x2fe576faa841347a9b1b32c869685deb75a15e3f62dfe37cbd6d52cc403a16f6::pool::repay_fa",
-		functionArguments: [positionId, mint.toString(), amount],
+	const FUNGIBLE_ASSET_DATA: InputTransactionData = {data:{
+			function: "0x2fe576faa841347a9b1b32c869685deb75a15e3f62dfe37cbd6d52cc403a16f6::pool::repay_fa",
+			functionArguments: [positionId, mint.toString(), amount],
+		}
 	}
-
 	try {
-		const transaction = await agent.aptos.transaction.build.simple({
-			sender: agent.account.getAddress(),
-			data: fungibleAsset ? FUNGIBLE_ASSET_DATA : COIN_STANDARD_DATA,
-		})
 
-		const committedTransactionHash = await agent.account.sendTransaction(transaction)
-
-		const signedTransaction = await agent.aptos.waitForTransaction({
-			transactionHash: committedTransactionHash,
-		})
-
-		if (!signedTransaction.success) {
-			console.error(signedTransaction, "Token repay failed")
-			throw new Error("Token repay failed")
-		}
-
-		return {
-			hash: signedTransaction.hash,
-			positionId,
-		}
+		return fungibleAsset ? FUNGIBLE_ASSET_DATA : COIN_STANDARD_DATA
 	} catch (error: any) {
 		throw new Error(`Token repay failed: ${error.message}`)
 	}

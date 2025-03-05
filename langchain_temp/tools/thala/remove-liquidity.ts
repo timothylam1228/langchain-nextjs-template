@@ -1,5 +1,6 @@
 import type { MoveStructId } from "@aptos-labs/ts-sdk"
 import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Remove liquidity from Thala pool
@@ -14,11 +15,10 @@ export async function removeLiquidityWithThala(
 	mintTypeX: MoveStructId,
 	mintTypeY: MoveStructId,
 	lpAmount: number
-): Promise<string> {
+): Promise<InputTransactionData> {
 	try {
-		const transaction = await agent.aptos.transaction.build.simple({
-			sender: agent.account.getAddress(),
-			data: {
+
+		return {data: {
 				function:
 					"0x48271d39d0b05bd6efca2278f22277d6fcc375504f9839fd73f74ace240861af::weighted_pool_scripts::remove_liquidity",
 				typeArguments: [
@@ -32,21 +32,7 @@ export async function removeLiquidityWithThala(
 					"0x48271d39d0b05bd6efca2278f22277d6fcc375504f9839fd73f74ace240861af::base_pool::Null",
 				],
 				functionArguments: [lpAmount, 0, 0, 0, 0],
-			},
-		})
-
-		const committedTransactionHash = await agent.account.sendTransaction(transaction)
-
-		const signedTransaction = await agent.aptos.waitForTransaction({
-			transactionHash: committedTransactionHash,
-		})
-
-		if (!signedTransaction.success) {
-			console.error(signedTransaction, "Remove liquidity failed")
-			throw new Error("Remove liquidity failed")
-		}
-
-		return signedTransaction.hash
+			}}
 	} catch (error: any) {
 		throw new Error(`Remove liquidity failed: ${error.message}`)
 	}

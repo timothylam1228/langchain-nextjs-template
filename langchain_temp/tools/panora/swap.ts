@@ -1,5 +1,6 @@
 import axios from "axios"
 import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Swap tokens in panora
@@ -16,7 +17,7 @@ export async function swapWithPanora(
 	toToken: string,
 	swapAmount: number,
 	toWalletAddress?: string
-): Promise<string> {
+): Promise<InputTransactionData> {
 	try {
 		const panoraParameters = {
 			fromTokenAddress: fromToken,
@@ -49,27 +50,11 @@ export async function swapWithPanora(
 
 		const transactionData = response.quotes[0].txData
 
-		const transaction = await agent.aptos.transaction.build.simple({
-			sender: agent.account.getAddress(),
-			data: {
+		return {data: {
 				function: transactionData.function,
 				typeArguments: transactionData.type_arguments,
 				functionArguments: transactionData.arguments,
-			},
-		})
-
-		const committedTransactionHash = await agent.account.sendTransaction(transaction)
-
-		const signedTransaction = await agent.aptos.waitForTransaction({
-			transactionHash: committedTransactionHash,
-		})
-
-		if (!signedTransaction.success) {
-			console.error(signedTransaction, "Swap failed")
-			throw new Error("Swap tx failed")
-		}
-
-		return signedTransaction.hash
+			}}
 	} catch (error: any) {
 		throw new Error(`Swap failed: ${error.message}`)
 	}

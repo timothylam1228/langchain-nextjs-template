@@ -1,5 +1,6 @@
 import type { MoveStructId } from "@aptos-labs/ts-sdk"
 import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Add liquidity in liquidswap
@@ -16,11 +17,10 @@ export async function addLiquidity(
 	mintY: MoveStructId,
 	mintXAmount: number,
 	mintYAmount: number
-): Promise<string> {
+): Promise<InputTransactionData> {
 	try {
-		const transaction = await agent.aptos.transaction.build.simple({
-			sender: agent.account.getAddress(),
-			data: {
+
+		return { data: {
 				function: "0x9dd974aea0f927ead664b9e1c295e4215bd441a9fb4e53e5ea0bf22f356c8a2b::router::add_liquidity_v05",
 				typeArguments: [
 					mintX,
@@ -33,21 +33,7 @@ export async function addLiquidity(
 					mintYAmount,
 					0, // coin_y_min
 				],
-			},
-		})
-
-		const committedTransactionHash = await agent.account.sendTransaction(transaction)
-
-		const signedTransaction = await agent.aptos.waitForTransaction({
-			transactionHash: committedTransactionHash,
-		})
-
-		if (!signedTransaction.success) {
-			console.error(signedTransaction, "Add liquidity failed")
-			throw new Error("Add liquidity failed")
-		}
-
-		return signedTransaction.hash
+			} }
 	} catch (error: any) {
 		console.error(error, "Add liquidity failed")
 		throw new Error(`Add liquidity failed: ${error.message}`)

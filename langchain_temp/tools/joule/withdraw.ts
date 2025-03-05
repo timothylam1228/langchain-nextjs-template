@@ -1,5 +1,6 @@
 import { AccountAddress, type InputGenerateTransactionPayloadData, type MoveStructId } from "@aptos-labs/ts-sdk"
 import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Withdraw APT, tokens or fungible asset from a position
@@ -21,46 +22,25 @@ export async function withdrawToken(
 	mint: MoveStructId,
 	positionId: string,
 	fungibleAsset: boolean
-): Promise<{
-	hash: string
-	positionId: string
-}> {
+): Promise<InputTransactionData> {
 	const pyth_update_data = await agent.getPythData()
 
 	const DEFAULT_FUNCTIONAL_ARGS = [positionId, amount, pyth_update_data]
 
-	const COIN_STANDARD_DATA: InputGenerateTransactionPayloadData = {
-		function: "0x2fe576faa841347a9b1b32c869685deb75a15e3f62dfe37cbd6d52cc403a16f6::pool::withdraw",
-		typeArguments: [mint.toString()],
-		functionArguments: DEFAULT_FUNCTIONAL_ARGS,
-	}
+	const COIN_STANDARD_DATA: InputTransactionData = {data:{
+			function: "0x2fe576faa841347a9b1b32c869685deb75a15e3f62dfe37cbd6d52cc403a16f6::pool::withdraw",
+			typeArguments: [mint.toString()],
+			functionArguments: DEFAULT_FUNCTIONAL_ARGS,
+		}}
 
-	const FUNGIBLE_ASSET_DATA: InputGenerateTransactionPayloadData = {
-		function: "0x2fe576faa841347a9b1b32c869685deb75a15e3f62dfe37cbd6d52cc403a16f6::pool::withdraw_fa",
-		functionArguments: [positionId, mint.toString(), amount, pyth_update_data],
+	const FUNGIBLE_ASSET_DATA: InputTransactionData ={data: {
+			function: "0x2fe576faa841347a9b1b32c869685deb75a15e3f62dfe37cbd6d52cc403a16f6::pool::withdraw_fa",
+			functionArguments: [positionId, mint.toString(), amount, pyth_update_data],
+		}
 	}
-
 	try {
-		const transaction = await agent.aptos.transaction.build.simple({
-			sender: agent.account.getAddress(),
-			data: fungibleAsset ? FUNGIBLE_ASSET_DATA : COIN_STANDARD_DATA,
-		})
 
-		const committedTransactionHash = await agent.account.sendTransaction(transaction)
-
-		const signedTransaction = await agent.aptos.waitForTransaction({
-			transactionHash: committedTransactionHash,
-		})
-
-		if (!signedTransaction.success) {
-			console.error(signedTransaction, "Token withdraw failed")
-			throw new Error("Token withdraw failed")
-		}
-
-		return {
-			hash: signedTransaction.hash,
-			positionId,
-		}
+		return fungibleAsset ? FUNGIBLE_ASSET_DATA : COIN_STANDARD_DATA
 	} catch (error: any) {
 		throw new Error(`Token withdraw failed: ${error.message}`)
 	}

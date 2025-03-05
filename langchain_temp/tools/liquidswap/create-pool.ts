@@ -1,5 +1,6 @@
 import type { MoveStructId } from "@aptos-labs/ts-sdk"
 import type { AgentRuntime } from "../../agent"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react";
 
 /**
  * Create a new pool in liquidswap
@@ -8,11 +9,9 @@ import type { AgentRuntime } from "../../agent"
  * @param mintY MoveStructId of the second token
  * @returns Transaction signature
  */
-export async function createPool(agent: AgentRuntime, mintX: MoveStructId, mintY: MoveStructId): Promise<string> {
+export async function createPool(agent: AgentRuntime, mintX: MoveStructId, mintY: MoveStructId): Promise<InputTransactionData> {
 	try {
-		const transaction = await agent.aptos.transaction.build.simple({
-			sender: agent.account.getAddress(),
-			data: {
+		return { data: {
 				function: "0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12::scripts_v2::register_pool",
 				typeArguments: [
 					mintX,
@@ -20,21 +19,7 @@ export async function createPool(agent: AgentRuntime, mintX: MoveStructId, mintY
 					"0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12::curves::Uncorrelated",
 				],
 				functionArguments: [],
-			},
-		})
-
-		const committedTransactionHash = await agent.account.sendTransaction(transaction)
-
-		const signedTransaction = await agent.aptos.waitForTransaction({
-			transactionHash: committedTransactionHash,
-		})
-
-		if (!signedTransaction.success) {
-			console.error(signedTransaction, "Create pool failed")
-			throw new Error("Create pool failed")
-		}
-
-		return signedTransaction.hash
+			}}
 	} catch (error: any) {
 		throw new Error(`Create pool failed: ${error.message}`)
 	}
