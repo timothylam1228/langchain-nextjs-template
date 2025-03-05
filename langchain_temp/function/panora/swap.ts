@@ -35,7 +35,7 @@ export class PanoraSwapTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				swapTransactionHash,
+				inputdata:swapTransactionHash,
 				token: [
 					{
 						mintX: mintXDetail.name,

@@ -24,7 +24,7 @@ export class ThalaStakeTokenTool extends Tool {
 
       return JSON.stringify({
         status: "success",
-        stakeTransactionHash,
+        inputdata:stakeTransactionHash,
         token: {
           name: "thAPT",
           decimals: 8,

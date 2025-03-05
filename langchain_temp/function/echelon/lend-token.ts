@@ -42,7 +42,7 @@ export class EchelonLendTokenTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				lendTokenTransactionHash,
+				inputdata:lendTokenTransactionHash,
 				token: {
 					name: mintDetail.name || "APT",
 					decimals: mintDetail.decimals || 8,

@@ -50,7 +50,7 @@ export class LiquidSwapCreatePoolTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				createPoolTransactionHash,
+				inputdata:createPoolTransactionHash,
 				token: [
 					{
 						mintX: mintXDetail.name,

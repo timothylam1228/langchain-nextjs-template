@@ -35,7 +35,7 @@ export class ThalaRemoveLiquidityTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				removeLiquidityTransactionHash,
+				inputdata:removeLiquidityTransactionHash,
 				tokens: [
 					{
 						mintX: mintXDetail.name,

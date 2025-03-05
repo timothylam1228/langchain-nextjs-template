@@ -16,7 +16,7 @@ export class AriesCreateProfileTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				createProfileTransactionHash,
+				inputdata:createProfileTransactionHash,
 			})
 		} catch (error: any) {
 			return JSON.stringify({

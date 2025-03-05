@@ -42,7 +42,7 @@ export class EchelonWithdrawTokenTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				withdrawTokenTransactionHash,
+				inputdata:withdrawTokenTransactionHash,
 				token: {
 					name: mintDetail.name || "APT",
 					decimals: mintDetail.decimals || 8,

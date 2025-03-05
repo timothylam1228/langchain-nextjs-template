@@ -24,7 +24,7 @@ export class EchoUnstakeTokenTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				unstakeTransactionHash,
+				inputdata:unstakeTransactionHash,
 				token: {
 					name: "APT",
 					decimals: 8,

@@ -37,7 +37,7 @@ export class ThalaRedeemMODTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				redeemMODTransactionHash,
+				inputdata:redeemMODTransactionHash,
 				token: {
 					name: tokenDetails.name,
 					decimals: tokenDetails.decimals,

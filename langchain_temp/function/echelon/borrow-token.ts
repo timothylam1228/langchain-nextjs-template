@@ -42,7 +42,7 @@ export class EchelonBorrowTokenTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				borrowTokenTransactionHash,
+				inputdata:borrowTokenTransactionHash,
 				token: {
 					name: mintDetail.name || "APT",
 					decimals: mintDetail.decimals || 8,

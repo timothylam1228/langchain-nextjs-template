@@ -31,7 +31,7 @@ export class AriesLendTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				lendTokenTransactionHash,
+				inputdata:lendTokenTransactionHash,
 				token: {
 					name: mintDetail.name,
 					decimals: mintDetail.decimals,

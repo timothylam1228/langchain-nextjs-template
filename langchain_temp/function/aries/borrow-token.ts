@@ -19,6 +19,7 @@ export class AriesBorrowTool extends Tool {
 	}
 
 	protected async _call(input: string): Promise<string> {
+
 		try {
 			const parsedInput = parseJson(input)
 
@@ -31,7 +32,7 @@ export class AriesBorrowTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				borrowTokenTransactionHash,
+				inputdata:borrowTokenTransactionHash,
 				token: {
 					name: mintDetail.name,
 					decimals: mintDetail.decimals,

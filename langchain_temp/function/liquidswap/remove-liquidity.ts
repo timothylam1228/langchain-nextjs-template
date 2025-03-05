@@ -59,7 +59,7 @@ minMintY: number, eg 1 or 0.01 (optional)`
 
 			return JSON.stringify({
 				status: "success",
-				removeLiquidityTransactionHash,
+				inputdata:removeLiquidityTransactionHash,
 				token: [
 					{
 						mintX: mintXDetail.name,

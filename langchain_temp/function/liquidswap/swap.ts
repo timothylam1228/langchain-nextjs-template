@@ -58,7 +58,7 @@ minCoinOut: number, eg 1 or 0.01 (optional)`
 
 			return JSON.stringify({
 				status: "success",
-				swapTransactionHash,
+				inputdata:swapTransactionHash,
 				token: [
 					{
 						mintX: mintXDetail.name,

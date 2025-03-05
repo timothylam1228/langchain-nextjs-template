@@ -35,7 +35,7 @@ export class ThalaAddLiquidityTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				addLiquidityTransactionHash,
+				inputdata:addLiquidityTransactionHash,
 				tokens: [
 					{
 						mintX: mintXDetail.name,

@@ -24,7 +24,7 @@ export class EchoStakeTokenTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				stakeTransactionHash,
+				inputdata:stakeTransactionHash,
 				token: {
 					name: "eAPT",
 					decimals: 8,

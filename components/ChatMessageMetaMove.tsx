@@ -62,11 +62,7 @@ export function ChatMessageMetaMove(props: {
         console.error("Error parsing message:", e);
       }
     }
-  }, [
-    message,
-    getTransactionState(message.id).isSubmitting,
-    lastProcessedMessageId,
-  ]);
+  }, [message, lastProcessedMessageId, getTransactionState, props.message]);
 
   /**
    * Process transaction when detected
@@ -133,11 +129,7 @@ export function ChatMessageMetaMove(props: {
     };
 
     processTransaction();
-  }, [
-    pendingTransaction,
-    submitToChain,
-    getTransactionState(message.id).isSubmitting,
-  ]);
+  }, [getTransactionState, message, pendingTransaction, submitToChain]);
 
   return (
     <div

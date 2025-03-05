@@ -35,7 +35,7 @@ export class ThalaMintMODTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				mintMODTransactionHash,
+				inputdata:mintMODTransactionHash,
 				token: {
 					name: "MOD",
 					decimals: 8,

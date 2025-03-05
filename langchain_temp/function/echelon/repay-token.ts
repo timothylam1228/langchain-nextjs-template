@@ -40,7 +40,7 @@ export class EchelonRepayTokenTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				repayTokenTransactionHash,
+				inputdata:repayTokenTransactionHash,
 				token: {
 					name: mintDetail.name || "APT",
 					decimals: mintDetail.decimals || 8,

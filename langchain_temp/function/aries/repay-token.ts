@@ -31,7 +31,7 @@ export class AriesRepayTool extends Tool {
 
 			return JSON.stringify({
 				status: "success",
-				repayTokenTransactionHash,
+				inputdata:repayTokenTransactionHash,
 				token: {
 					name: mintDetail.name,
 					decimals: mintDetail.decimals,
