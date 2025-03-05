@@ -21,6 +21,14 @@ const aptos_tools = [
   "aptos_get_wallet_address",
   "aptos_transfer_token",
   "aptos_balance",
+  "aptos_get_token_details",
+  "aptos_get_pool_details",
+  "aptos_get_user_all_positions",
+  "aptos_get_user_position",
+  "aptos_lend_token",
+  "aptos_borrow_token",
+  "aptos_repay_token",
+  "aptos_transfer_nft",
 ];
 
 const formattedTools = [
@@ -131,6 +139,7 @@ const handleAIResponse = async (
     parsedContent = aiMessage.content;
   }
   // Check if the AI invoked tools
+
   if (aiMessage?.tool_calls) {
     for (const toolCall of aiMessage.tool_calls) {
       const selectedTool =
@@ -145,6 +154,11 @@ const handleAIResponse = async (
         try {
           if (aptos_tools.includes(selectedTool.name)) {
             const jsonResponse = JSON.parse(toolResponse);
+            // if inputdata is not present in the jsonResponse, then use the toolResponse
+            if (jsonResponse.inputdata) {
+              console.log("is jsonResponse", jsonResponse);
+              return { tool: selectedTool.name, response: toolResponse };
+            }
             // Use LLM to parse JSON content
             const llmResponse = await llm.invoke([
               {

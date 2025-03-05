@@ -64,6 +64,7 @@ export async function get_twotag_nft(
         }),
       });
       const result = await response.json();
+      console.log("result", result);
       return result;
     } catch (e: unknown) {
       console.log(e);
@@ -73,13 +74,12 @@ export async function get_twotag_nft(
   try {
     const graphqlData = await fetchGraphQL(operations, "MyQuery", {});
 
-    // const graphqlData = JSON.parse(Data)
-
-    // Extract and format data
     const tokenOwnerships: { current_token_data: NFTData }[] =
       graphqlData.data.current_token_ownerships_v2;
     const collectionData: CollectionData[] =
       graphqlData.data.current_collections_v2;
+
+    console.log("tokenOwnerships", tokenOwnerships);
 
     const formattedData: FormattedNFTData[] = tokenOwnerships.map(
       (ownership) => {

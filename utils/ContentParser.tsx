@@ -95,7 +95,42 @@ export const ContentParser: React.FC<ContentParserProps> = ({
   try {
     const content = JSON.parse(message.content);
     const tool = content.messages?.tool;
+    console.log("content in parser", content.messages);
 
+    if (content.messages.content.inputdata) {
+      const inputData = content.messages.content.inputdata as InputTransactionData;
+      
+      if (!transactionState) {
+        return <div>Transaction state not found</div>;
+      }
+
+      const { transactionHash, code } = transactionState;
+
+      if (code === TransactionCode.USER_REJECTED) {
+        return <div>Transaction rejected by user</div>;
+      }
+
+      if (code === TransactionCode.TRANSACTION_ALREADY_IN_PROGRESS) {
+        return <div>Transaction already in progress</div>;
+      }
+
+      if (code === TransactionCode.TRANSACTION_FAILED) {
+        return <div>Transaction failed</div>;
+      }
+
+      if (code === TransactionCode.TRANSACTION_SUCCESS) {
+        return (
+          <div>
+            Transaction successful
+            <div>transactionHash: {transactionHash}</div>
+          </div>
+        );
+      }
+
+      if (code === TransactionCode.TRANSACTION_PENDING) {
+        return <div>Transaction pending</div>;
+      }
+    }
     switch (tool) {
       case "get_hashtags":
         return <HashtagsView hashtags={content.messages.content} />;
@@ -218,40 +253,6 @@ export const ContentParser: React.FC<ContentParserProps> = ({
             <Wallet />
           </div>
         );
-
-      case "aptos_transfer_token":
-        // Don't call submitToChain here - just display the transaction info
-
-        if (!transactionState) {
-          return <div>Transaction state not found</div>;
-        }
-
-        const { transactionHash, code } = transactionState;
-
-        if (code === TransactionCode.USER_REJECTED) {
-          return <div>Transaction rejected by user</div>;
-        }
-
-        if (code === TransactionCode.TRANSACTION_ALREADY_IN_PROGRESS) {
-          return <div>Transaction already in progress</div>;
-        }
-
-        if (code === TransactionCode.TRANSACTION_FAILED) {
-          return <div>Transaction failed</div>;
-        }
-
-        if (code === TransactionCode.TRANSACTION_SUCCESS) {
-          return (
-            <div>
-              Transaction successful
-              <div>transactionHash: {transactionHash}</div>
-            </div>
-          );
-        }
-
-        if (code === TransactionCode.TRANSACTION_PENDING) {
-          return <div>Transaction pending</div>;
-        }
 
       default:
         try {

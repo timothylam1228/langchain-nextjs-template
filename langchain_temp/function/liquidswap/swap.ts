@@ -1,12 +1,12 @@
-import { convertAmountFromHumanReadableToOnChain } from "@aptos-labs/ts-sdk"
-import { Tool } from "langchain/tools"
-import { type AgentRuntime, parseJson } from "../.."
-import { getTokenByTokenName } from "../../utils/get-pool-address-by-token-name"
-import { parseFungibleAssetAddressToWrappedAssetAddress } from "../../utils/parse-fungible-asset-to-wrapped-asset"
+import { convertAmountFromHumanReadableToOnChain } from "@aptos-labs/ts-sdk";
+import { Tool } from "langchain/tools";
+import { type AgentRuntime, parseJson } from "../..";
+import { getTokenByTokenName } from "../../utils/get-pool-address-by-token-name";
+import { parseFungibleAssetAddressToWrappedAssetAddress } from "../../utils/parse-fungible-asset-to-wrapped-asset";
 
 export class LiquidSwapSwapTool extends Tool {
-	name = "liquidswap_swap"
-	description = `this tool can be used to swap tokens in liquidswap
+  name = "liquidswap_swap";
+  description = `this tool can be used to swap tokens in liquidswap
 
 want to swap APT and one of the token, mint is 0x1::aptos_coin::AptosCoin
 one of the token is USDT, use 0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT
@@ -23,59 +23,65 @@ Inputs (input is a JSON string):
 mintX: string, eg "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT" or "usdt (name of the token)" (required)
 mintY: string, eg (same as mintX) (required)
 swapAmount: number, eg 1 or 0.01 (required)
-minCoinOut: number, eg 1 or 0.01 (optional)`
+minCoinOut: number, eg 1 or 0.01 (optional)`;
 
-	constructor(private agent: AgentRuntime) {
-		super()
-	}
+  constructor(private agent: AgentRuntime) {
+    super();
+  }
 
-	protected async _call(input: string): Promise<string> {
-		try {
-			const parsedInput = parseJson(input)
+  protected async _call(input: string): Promise<string> {
+    try {
+      const parsedInput = parseJson(input);
 
-			let mintX = parsedInput.mintX
-			const tokenX = getTokenByTokenName(mintX)
-			if (tokenX) {
-				mintX = tokenX.tokenAddress
-			}
+      let mintX = parsedInput.mintX;
+      const tokenX = getTokenByTokenName(mintX);
+      if (tokenX) {
+        mintX = tokenX.tokenAddress;
+      }
 
-			let mintY = parsedInput.mintY
-			const tokenY = getTokenByTokenName(mintY)
-			if (tokenY) {
-				mintY = tokenY.tokenAddress
-			}
+      let mintY = parsedInput.mintY;
+      const tokenY = getTokenByTokenName(mintY);
+      if (tokenY) {
+        mintY = tokenY.tokenAddress;
+      }
 
-			const mintXDetail = await this.agent.getTokenDetails(mintX)
+      const mintXDetail = await this.agent.getTokenDetails(mintX);
 
-			const mintYDetail = await this.agent.getTokenDetails(mintY)
+      const mintYDetail = await this.agent.getTokenDetails(mintY);
 
-			const swapTransactionHash = await this.agent.swap(
-				mintX,
-				mintY,
-				convertAmountFromHumanReadableToOnChain(parsedInput.swapAmount, mintXDetail.decimals),
-				convertAmountFromHumanReadableToOnChain(parsedInput.minCoinOut, mintXDetail.decimals) || 0
-			)
+      const swapTransactionHash = await this.agent.swap(
+        mintX,
+        mintY,
+        convertAmountFromHumanReadableToOnChain(
+          parsedInput.swapAmount,
+          mintXDetail.decimals,
+        ),
+        convertAmountFromHumanReadableToOnChain(
+          parsedInput.minCoinOut,
+          mintXDetail.decimals,
+        ) || 0,
+      );
 
-			return JSON.stringify({
-				status: "success",
-				inputdata:swapTransactionHash,
-				token: [
-					{
-						mintX: mintXDetail.name,
-						decimals: mintXDetail.decimals,
-					},
-					{
-						mintY: mintYDetail.name,
-						decimals: mintYDetail.decimals,
-					},
-				],
-			})
-		} catch (error: any) {
-			return JSON.stringify({
-				status: "error",
-				message: error.message,
-				code: error.code || "UNKNOWN_ERROR",
-			})
-		}
-	}
+      return JSON.stringify({
+        status: "success",
+        inputdata: swapTransactionHash,
+        token: [
+          {
+            mintX: mintXDetail.name,
+            decimals: mintXDetail.decimals,
+          },
+          {
+            mintY: mintYDetail.name,
+            decimals: mintYDetail.decimals,
+          },
+        ],
+      });
+    } catch (error: any) {
+      return JSON.stringify({
+        status: "error",
+        message: error.message,
+        code: error.code || "UNKNOWN_ERROR",
+      });
+    }
+  }
 }

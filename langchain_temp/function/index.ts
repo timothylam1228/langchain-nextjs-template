@@ -158,8 +158,7 @@ export const toolsByName = {
     new AptosAccountAddressTool(agent),
   aptos_transfer_token: (agent: AgentRuntime) =>
     new AptosTransferTokenTool(agent),
-  aptos_transfer_nft: (agent: AgentRuntime) =>
-    new AptosTransferNFTTool(agent),
+  aptos_transfer_nft: (agent: AgentRuntime) => new AptosTransferNFTTool(agent),
   aptos_burn_token: (agent: AgentRuntime) => new AptosBurnTokenTool(agent),
   aptos_transaction: (agent: AgentRuntime) => new AptosTransactionTool(agent),
   aptos_get_token_detail: (agent: AgentRuntime) =>

@@ -25,9 +25,6 @@ export function ChatMessageMetaMove(props: {
     string | null
   >(null);
 
-  /**
-   * Detect if message requires a transaction (aptos_transfer_token)
-   */
   useEffect(() => {
     if (
       getTransactionState(message.id).isSubmitting ||
@@ -37,23 +34,39 @@ export function ChatMessageMetaMove(props: {
 
     if (message.role === "assistant" && message.content) {
       try {
-        const content = JSON.parse(message.content);
+        let content;
+        try {
+          content = JSON.parse(message.content);
 
-        if (content.messages?.tool === "aptos_transfer_token") {
-          const txData = content.messages.content.inputdata;
+          // Check if content has messages structure
+          if (content.messages && content.messages.content) {
+            // Check if content.messages.content is a string that needs parsing
+            if (typeof content.messages.content === "string") {
+              try {
+                const parsedContent = JSON.parse(content.messages.content);
+                content.messages.content = parsedContent;
+              } catch (parseError) {
+                // content.messages.content is not JSON, keep as is
+              }
+            }
+          }
+        } catch (parseError) {
+          console.error("Failed to parse message content:", parseError);
+          return;
+        }
+        console.log("content", content);
+        if (content.messages.content.inputdata) {
+          const inputdata = content.messages.content.inputdata;
+          console.log("inputdata", inputdata);
+          const txData = inputdata;
+          console.log("txData", txData);
           setPendingTransaction(txData);
           setLastProcessedMessageId(message.id);
 
           // Update message content to indicate processing
           const updatedContent = JSON.stringify({
             ...content,
-            messages: {
-              ...content.messages,
-              content: {
-                ...content.messages.content,
-                status: "processing",
-              },
-            },
+            status: "processing",
           });
 
           props.message.content = updatedContent;
