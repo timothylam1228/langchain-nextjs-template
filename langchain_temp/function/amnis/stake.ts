@@ -35,7 +35,7 @@ export class AmnisStakeTool extends Tool {
 
       return JSON.stringify({
         status: "success",
-        stakeTransactionHash,
+        inputdata: stakeTransactionHash,
         token: {
           name: "stAPT",
           decimals: 8,

@@ -66,6 +66,16 @@ const copyTweetToClipboard = async (tweet: string, image?: string) => {
   }
 };
 
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success("Copied nft id to clipboard!");
+  } catch (error) {
+    console.error("Copy error:", error);
+    toast.error("Failed to copy!");
+  }
+};
+
 interface ContentParserProps {
   message: Message;
   transactionState?: TransactionState;
@@ -121,6 +131,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({
                 formattedData.map((nft: Tweet) => (
                   <div
                     key={nft.token_id}
+                    onClick={() => copyToClipboard(nft.token_id)}
                     className="border border-gray-300 rounded-lg p-2"
                   >
                     {nft.token_uri ? (

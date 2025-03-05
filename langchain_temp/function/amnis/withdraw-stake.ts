@@ -35,7 +35,7 @@ export class AmnisWithdrawStakeTool extends Tool {
 
       return JSON.stringify({
         status: "success",
-        withdrawStakeTransactionHash,
+        inputdata: withdrawStakeTransactionHash,
         token: {
           name: "APT",
           decimals: 8,

@@ -1,10 +1,10 @@
-import { convertAmountFromHumanReadableToOnChain } from "@aptos-labs/ts-sdk"
-import { Tool } from "langchain/tools"
-import type { AgentRuntime } from "../../agent"
-import { parseJson } from "../../utils"
+import { convertAmountFromHumanReadableToOnChain } from "@aptos-labs/ts-sdk";
+import { Tool } from "langchain/tools";
+import type { AgentRuntime } from "../../agent";
+import { parseJson } from "../../utils";
 export class ThalaRedeemMODTool extends Tool {
-	name = "thala_redeem_mod"
-	description = `this tool can be used to redeem move dollar (MOD) in Thala
+  name = "thala_redeem_mod";
+  description = `this tool can be used to redeem move dollar (MOD) in Thala
 
   Only supported coin types: lzUSDC, whUSDC, or USDt
 
@@ -18,37 +18,39 @@ export class ThalaRedeemMODTool extends Tool {
     Inputs ( input is a JSON string ):
     mintType: string, eg "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT" (required)
     amount: number, eg 1 or 0.01 (required)
-    `
+    `;
 
-	constructor(private agent: AgentRuntime) {
-		super()
-	}
+  constructor(private agent: AgentRuntime) {
+    super();
+  }
 
-	protected async _call(input: string): Promise<string> {
-		try {
-			const parsedInput = parseJson(input)
+  protected async _call(input: string): Promise<string> {
+    try {
+      const parsedInput = parseJson(input);
 
-			const tokenDetails = await this.agent.getTokenDetails(parsedInput.mintType)
+      const tokenDetails = await this.agent.getTokenDetails(
+        parsedInput.mintType,
+      );
 
-			const redeemMODTransactionHash = await this.agent.redeemMODWithThala(
-				parsedInput.mintType,
-				convertAmountFromHumanReadableToOnChain(parsedInput.amount, 6)
-			)
+      const redeemMODTransactionHash = await this.agent.redeemMODWithThala(
+        parsedInput.mintType,
+        convertAmountFromHumanReadableToOnChain(parsedInput.amount, 6),
+      );
 
-			return JSON.stringify({
-				status: "success",
-				inputdata:redeemMODTransactionHash,
-				token: {
-					name: tokenDetails.name,
-					decimals: tokenDetails.decimals,
-				},
-			})
-		} catch (error: any) {
-			return JSON.stringify({
-				status: "error",
-				message: error.message,
-				code: error.code || "UNKNOWN_ERROR",
-			})
-		}
-	}
+      return JSON.stringify({
+        status: "success",
+        inputdata: redeemMODTransactionHash,
+        token: {
+          name: tokenDetails.name,
+          decimals: tokenDetails.decimals,
+        },
+      });
+    } catch (error: any) {
+      return JSON.stringify({
+        status: "error",
+        message: error.message,
+        code: error.code || "UNKNOWN_ERROR",
+      });
+    }
+  }
 }

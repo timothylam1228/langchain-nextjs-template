@@ -25,17 +25,7 @@ export class AptosTransferTokenTool extends Tool {
     super();
   }
 
-  protected async _call(input: string): Promise<{
-    status: string;
-    inputdata?: {
-      data: {
-        function: string;
-        typeArguments: string[];
-        functionArguments: string[];
-      };
-    };
-    token: { name: string; decimals: number };
-  }> {
+  protected async _call(input: string): Promise<string> {
     try {
       const parsedInput = parseJson(input);
 
@@ -53,20 +43,21 @@ export class AptosTransferTokenTool extends Tool {
         parsedInput.mint,
       );
 
-      return {
+      return JSON.stringify({
         status: "success",
+        content: "done",
         inputdata: transferTokenTransactionHash,
         token: {
           name: mintDetail.name,
           decimals: mintDetail.decimals,
         },
-      };
+      });
     } catch (error: any) {
-      return {
+      return JSON.stringify({
         status: "error",
-        inputdata: undefined,
-        token: { name: "", decimals: 0 },
-      };
+        message: error.message,
+        code: error.code || "UNKNOWN_ERROR",
+      });
     }
   }
 }
